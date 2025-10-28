@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+float random_float(float min, float max) {
+    if (min > max) { // Handle cases where min is greater than max
+        float temp = min;
+        min = max;
+        max = temp;
+    }
+    return ((float)rand() / RAND_MAX) * (max - min) + min;
+}
+
 //multiplies two matrices and returns the resulting matrix
 matrix* multiply_matrices(matrix* m1, matrix* m2) {
     //check if this is a valid multiplication
@@ -54,6 +63,26 @@ matrix* form_matrix(int rows, int cols, ...) {
         m->data[i] = va_arg(args, double);
     }
     va_end(args);
+
+    return m;
+}
+
+//forms a matrix given a number of rows and columns, and a min and max value for the entries
+matrix* generate_matrix(int rows, int cols, float min, float max) {
+    matrix* m = (matrix*) malloc(sizeof(matrix));
+    if (m == NULL) {
+        return (matrix*) m;
+    }
+    m->rows = rows;
+    m->cols = cols;
+    m->data = (float*) malloc(rows * cols * sizeof(float));
+    while (m->data == NULL) {
+        m->data = (float*) malloc(rows * cols * sizeof(float));
+    }
+
+    for (int index = 0; index < rows * cols; index++) {
+        m->data[index] = random_float(min, max);
+    }
 
     return m;
 }

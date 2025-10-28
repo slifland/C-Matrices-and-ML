@@ -11,6 +11,8 @@ typedef struct {
     float* data;
 } matrix;
 
+float random_float(float min, float max);
+
 //multiplies two matrices and returns the resulting matrix
 matrix* multiply_matrices(matrix* m1, matrix* m2);
 
@@ -20,8 +22,12 @@ matrix* multiply_matrices_parallel(matrix* m1, matrix* m2);
 //forms a matrix given a number of rows and columns, and the numbers arranged in order
 matrix* form_matrix(int rows, int cols, ...);
 
+//forms a matrix given a number of rows and columns, and a min and max value for the entries
+matrix* generate_matrix(int rows, int cols, float min, float max);
+
 //calculates dot product of row i of matrix m1 and column j of matrix m2
 float dot_product(matrix* m1, int i, matrix* m2, int j);
+
 
 //returns the 1d index associated with a 2d i, j
 int get_index(matrix* m, int i, int j);
