@@ -150,6 +150,23 @@ matrix* generate_matrix(int rows, int cols, float min, float max) {
     return m;
 }
 
+//returns a newly allocated transposed version of the given matrix
+matrix* transpose_matrix(matrix* m) {
+    matrix* result = (matrix*) malloc(sizeof(matrix));
+    result->cols = m->rows;
+    result->rows = m->cols;
+    result->data = (float*) malloc(result->cols * result->rows * sizeof(float));
+    int index = 0;
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            result->data[get_index(result, j, i)] = m->data[index];
+            index += 1;
+        }
+    }
+    return result;
+
+}
+
 //calculates dot product of row i of matrix m1 and column j of matrix m2
 float dot_product(matrix* m1, int i, matrix* m2, int j) {
     float value = 0;
@@ -181,5 +198,25 @@ void print_matrix(matrix* m) {
         }
         printf("]\n");
     }
+}
+
+//adds a vector to the matrix, adding each element in the vector to every element in the corresponding matrix row
+void extended_add(matrix* m, float* vector) {
+    int index = 0;
+    for(int i = 0; i < m->rows; i++) {
+        for(int j = 0; j < m->cols; j++) {
+            m->data[index] += vector[i];
+            index++;
+        }
+    }
+}
+
+//generates a vector of dimension 1xsize with values between min and max
+float* generate_vector(int size, float min, float max) {
+    float* vector = (float*) malloc(size * sizeof(float));
+    for(int i = 0; i < size; i++) {
+        vector[i] = random_float(min, max);
+    }
+    return vector;
 }
 

@@ -1,6 +1,9 @@
 /*
-This header file defines the outline for matrix.h, which contains the matrix struct as well as matrix functions.
+This header file defines the outline for libmat.a, which contains the matrix struct as well as matrix functions.
 */
+
+#ifndef MATRIX_H
+#define MATRIX_H
 
 #include <stdarg.h>
 
@@ -37,6 +40,9 @@ matrix* form_matrix(int rows, int cols, ...);
 //forms a matrix given a number of rows and columns, and a min and max value for the entries
 matrix* generate_matrix(int rows, int cols, float min, float max);
 
+//returns a newly allocated transposed version of the given matrix
+matrix* transpose_matrix(matrix* m);
+
 //calculates dot product of row i of matrix m1 and column j of matrix m2
 float dot_product(matrix* m1, int i, matrix* m2, int j);
 
@@ -49,4 +55,11 @@ void free_matrix(matrix* m);
 //prints the matrix in a human readable format
 void print_matrix(matrix* m);
 
+//adds a vector to the matrix, adding each element in the vector to every element in the corresponding matrix row
+void extended_add(matrix* m, float* vector);
+
+//generates a vector of dimension 1xsize with values between min and max
+float* generate_vector(int size, float min, float max);
+
+#endif /* MATRIX_H */
 

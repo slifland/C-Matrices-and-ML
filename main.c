@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include "neural_net.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -48,7 +49,23 @@ void time_test(int start, int end, int inc) {
 int main() {
     srand(time(NULL));
 
-    time_test(1000, 1001, 100);
+    //time_test(1000, 1001, 100);
 
+    neural_net* net = init_network(3, 1, 0, 0);
+
+    matrix* inputs = malloc(sizeof(matrix));
+    inputs->cols = 1;
+    inputs->rows = 3;
+    inputs->data = malloc(sizeof(float) * 3);
+    inputs->data[0] = 0.1f;
+    inputs->data[1] = 0.2f;
+    inputs->data[3] = 0.3f;
+    float* result = forward_pass(net, inputs);
+
+    printf("%f", result[0]);
+
+    free_network(net);
+    free_matrix(inputs);
+    free(result);
     return 0;
 }
