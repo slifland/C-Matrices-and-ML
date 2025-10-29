@@ -2,6 +2,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
+
+#define THREAD_COUNT 8
 
 float random_float(float min, float max) {
     if (min > max) { // Handle cases where min is greater than max
@@ -44,7 +47,67 @@ matrix* multiply_matrices(matrix* m1, matrix* m2) {
 
 //multiplies two matrices and returns the resulting matrix, using threads for parallelization
 matrix* multiply_matrices_parallel(matrix* m1, matrix* m2) {
-    return (matrix*) NULL;
+    //check if this is a valid multiplication
+    if (m1->cols != m2->rows) {
+        return (matrix*) NULL;
+    }
+    matrix* result = (matrix*) malloc(sizeof(matrix));
+    if (result == NULL) {
+        return (matrix*) result;
+    }
+
+    result->rows = m1->rows;
+    result->cols = m2->cols;
+    result->data = (float*) malloc(result->rows * result->cols * sizeof(float));
+    while (result->data == NULL) {
+        result->data = (float*) malloc(result->rows * result->cols * sizeof(float));
+    }
+
+    pthread_t thread_ids[THREAD_COUNT];
+    row_worker_args tasks[THREAD_COUNT];
+    int rows_per_thread = (result->rows + THREAD_COUNT - 1) / THREAD_COUNT;
+    int cur_row = 0;
+
+    for(int thread = 0; thread < THREAD_COUNT; thread++) {
+        int start = cur_row;
+        int end = start +rows_per_thread;
+        if (start >= result->rows) {
+            thread_ids[thread] = 0;
+            continue;
+        }
+        else if (end > result->rows) {
+            end = result->rows;
+        }
+
+        tasks[thread] = (row_worker_args) {
+            .m1 = m1,
+            .m2 = m2,
+            .result = result,
+            .row_start = start,
+            .row_end = end
+        };
+        pthread_create(&thread_ids[thread], NULL, row_calcs, &tasks[thread]);
+        cur_row = end;
+    }
+
+    for(int thread = 0; thread < THREAD_COUNT; thread++) {
+        if(thread_ids[thread] != 0) {
+            pthread_join(thread_ids[thread], NULL);
+        }
+    }
+    return result;
+}
+
+//does the dot product calculations for a set of rows
+void* row_calcs(void* args) {
+    row_worker_args* row_args = (row_worker_args* ) args;
+    for (int i = row_args->row_start; i < row_args->row_end; ++i) {
+        for (int j = 0; j < row_args->m2->cols; ++j) {
+            row_args->result->data[i * row_args->result->cols + j] =
+                dot_product(row_args->m1, i, row_args->m2, j);
+        }
+    }
+    return NULL;
 }
 
 //forms a matrix given a number of rows and columns, and the numbers arranged in order
@@ -95,8 +158,6 @@ float dot_product(matrix* m1, int i, matrix* m2, int j) {
     }
     return value;
 }
-
-
 
 //returns the 1d index associated with a 2d i, j
 int get_index(matrix* m, int i, int j) {
