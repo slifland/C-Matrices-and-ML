@@ -55,18 +55,21 @@ int main() {
 
     //time_test(1000, 1001, 100);
 
-    neural_net* net = init_network(3, 1, 0, 0, 1);
+    neural_net* net = init_network(3, 1, 0, 0, 2);
 
     matrix* inputs = malloc(sizeof(matrix));
-    inputs->cols = 1;
+    inputs->cols = 2;
     inputs->rows = 3;
-    inputs->data = malloc(sizeof(float) * 3);
+    inputs->data = malloc(sizeof(float) * 6);
     inputs->data[0] = 0.1f;
-    inputs->data[1] = 0.2f;
-    inputs->data[2] = 0.3f;
+    inputs->data[1] = 0.0f;
+    inputs->data[2] = 0.2f;
+    inputs->data[3] = 0.5f;
+    inputs->data[4] = 0.3f;
+    inputs->data[5] = -1.0f;
     matrix* result = forward_pass(net, inputs);
 
-    printf("%f", result->data[0]);
+    printf("%f %f", result->data[0], result->data[1]);
 
 
     free_network(net);
