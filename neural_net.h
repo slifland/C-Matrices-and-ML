@@ -9,6 +9,7 @@ This header file defines the outline for libnet.a, which contains the neural net
 #include <stdio.h>
 //neural net consisting of multiple layers, and relevant metadata
 typedef struct {
+    int batch_size;
     int hidden_layers;
     int hidden_size;     //for now, all hidden layers are same size
     int input_size;
@@ -18,10 +19,10 @@ typedef struct {
 } neural_net;
 
 //initializes a network with weights and biases between -1.0f and 1.0f
-neural_net* init_network(int input_size, int output_size, int hidden_size, int hidden_layers);
+neural_net* init_network(int input_size, int output_size, int hidden_size, int hidden_layers, int batch_size);
 
 //does a forward pass, returns the outputs as a vector
-float* forward_pass(neural_net* net, matrix* inputs);
+matrix* forward_pass(neural_net* net, matrix* inputs);
 
 //calculates loss given predictions and ground truth values
 void calculate_loss(float* predictions, float* gt_values);

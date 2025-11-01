@@ -61,5 +61,11 @@ void extended_add(matrix* m, float* vector);
 //generates a vector of dimension 1xsize with values between min and max
 float* generate_vector(int size, float min, float max);
 
+//copies the values in a matrix to another matrix. deep copy. resizes dest to be same as src.
+void matrix_copy(matrix* src, matrix* dest);
+
+//copies the values from one vector to another. deep copy. resizes dest to be same as src.
+void vector_copy(float* src, float* dest, int len);
+
 #endif /* MATRIX_H */
 

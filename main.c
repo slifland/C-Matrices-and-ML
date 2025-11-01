@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include <time.h>
+#include <unistd.h>
 
 double time_matrix_multiplication(matrix *(*matrix_func)(matrix *, matrix *),
                                   matrix *m1,
@@ -47,11 +48,14 @@ void time_test(int start, int end, int inc) {
 
 
 int main() {
-    srand(time(NULL));
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    unsigned int seed = (unsigned int)(ts.tv_nsec ^ (ts.tv_sec * 1000000007u) ^ (unsigned int)getpid());
+    srand(seed);
 
     //time_test(1000, 1001, 100);
 
-    neural_net* net = init_network(3, 1, 0, 0);
+    neural_net* net = init_network(3, 1, 0, 0, 1);
 
     matrix* inputs = malloc(sizeof(matrix));
     inputs->cols = 1;
@@ -59,13 +63,14 @@ int main() {
     inputs->data = malloc(sizeof(float) * 3);
     inputs->data[0] = 0.1f;
     inputs->data[1] = 0.2f;
-    inputs->data[3] = 0.3f;
-    float* result = forward_pass(net, inputs);
+    inputs->data[2] = 0.3f;
+    matrix* result = forward_pass(net, inputs);
 
-    printf("%f", result[0]);
+    printf("%f", result->data[0]);
+
 
     free_network(net);
     free_matrix(inputs);
-    free(result);
+    free_matrix(result);
     return 0;
 }

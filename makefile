@@ -1,4 +1,4 @@
-CFLAGS = -Wall -fsanitize=address
+CFLAGS = -Wall -fsanitize=address -g
 CC = clang
 
 all: main

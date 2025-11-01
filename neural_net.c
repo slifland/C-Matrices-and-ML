@@ -4,7 +4,7 @@
 #include <math.h>
 
 //initializes a network with weights and biases between -1.0f and 1.0f
-neural_net* init_network(int input_size, int output_size, int hidden_size, int hidden_layers) {
+neural_net* init_network(int input_size, int output_size, int hidden_size, int hidden_layers, int batch_size) {
     neural_net* result = (neural_net*) malloc(sizeof(neural_net));
     if (result == NULL) {
         return (neural_net*) NULL;
@@ -14,6 +14,7 @@ neural_net* init_network(int input_size, int output_size, int hidden_size, int h
     result->output_size = output_size;
     result->hidden_size = hidden_size;
     result->hidden_layers = hidden_layers;
+    result->batch_size = batch_size;
     
     result->weights = (matrix**) malloc(sizeof(matrix*) * (hidden_layers + 1));
     result->biases = (float**) malloc(sizeof(float*) * (hidden_layers + 1));
@@ -40,25 +41,30 @@ neural_net* init_network(int input_size, int output_size, int hidden_size, int h
 
 //does a forward pass, returns the outputs as a vector
 //currently assumes inputs is input_sizex1, no batching for now
-float* forward_pass(neural_net* net, matrix* inputs) {
-    matrix* representations[net->hidden_layers + 1];
-    matrix* temp_representation;
+matrix* forward_pass(neural_net* net, matrix* inputs) {
+    matrix* temp_representation = (matrix*) malloc (sizeof(matrix));
+    temp_representation->data = NULL;
+    matrix* temp_result = NULL;
+
+    matrix_copy(inputs, temp_representation);
     for(int i = 0; i < net->hidden_layers + 1; i++) {
-        if (i == 0) {
-            temp_representation = multiply_matrices(net->weights[i], inputs);
+        if(net->weights[i]->rows * net->weights[i]->cols > 20) {
+            temp_result = multiply_matrices_parallel(net->weights[i], temp_representation);
         }
         else {
-            temp_representation = multiply_matrices(net->weights[i], temp_representation);
+            temp_result = multiply_matrices(net->weights[i], temp_representation);
         }
-        extended_add(temp_representation, net->biases[i]);
-        activation_function(temp_representation);
-        representations[i] = temp_representation;
+        extended_add(temp_result, net->biases[i]);
+        activation_function(temp_result);
+        matrix_copy(temp_result, temp_representation);
+        free_matrix(temp_result);
     }
-    float* retval = (float*) malloc(sizeof(float) * net->output_size);
-    *retval = *temp_representation->data;
-    for(int i = 0; i < net->hidden_layers + 1; i++) {
-        free_matrix(representations[i]);
-    }
+    matrix* retval = (matrix*) malloc(sizeof(matrix));
+    retval->rows = net->output_size;
+    retval->cols = net->batch_size;
+    retval->data = (float*) malloc(retval->rows * retval->cols * sizeof(float));
+    matrix_copy(temp_representation, retval);
+    free_matrix(temp_representation);
     return retval;
 }
 

@@ -220,3 +220,22 @@ float* generate_vector(int size, float min, float max) {
     return vector;
 }
 
+//copies the values in a matrix to another matrix. deep copy. resizes dest to be same as src.
+void matrix_copy(matrix* src, matrix* dest) {
+    dest->cols = src->cols;
+    dest->rows = src->rows;
+    dest->data = (float*) realloc(dest->data, sizeof(float) * dest->cols * dest->rows);
+    int index = 0;
+    while (index < src->cols * src->rows) {
+        dest->data[index] = src->data[index];
+        index += 1;
+    }
+}
+
+//copies the values from one vector to another. deep copy. resizes dest to be same as src.
+void vector_copy(float* src, float* dest, int len) {
+    for (int i = 0; i < len; i++) {
+        dest[i] = src[i];
+    }
+}
+
